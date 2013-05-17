@@ -1,8 +1,13 @@
 <?php namespace Teepluss\Attach;
 
-use Closure;
 use Illuminate\Config\Repository;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+use Closure;
 use WideImage\WideImage;
+
  
 class Attach {
 
@@ -12,6 +17,20 @@ class Attach {
      * @var array
      */
     public $config;
+
+    /**
+     * Request.
+     * 
+     * @var Illuminate\Http\Request 
+     */
+    protected $request;
+
+    /**
+     * Files.
+     * 
+     * @var Illuminate\Filesystem\Filesystem
+     */
+    protected $files;
 
     /**
      * File input.
@@ -49,10 +68,16 @@ class Attach {
      * @param   array  $params
      * @return  void
      */
-    public function __construct(Repository $config)
-    {
+    public function __construct(Repository $config, Request $request, Filesystem $files)
+    {   
         // Get config from file.
         $this->config = $config->get('attach::attach');
+
+        // Laravel request.
+        $this->request = $request;
+
+        // Laravel filesystem.
+        $this->files = $files;
     }
 
     /**
@@ -99,7 +124,8 @@ class Attach {
         $location = $this->path($this->config['baseDir']).$name;
 
         // Generate a result to use as a master file.
-        $result = $this->results($location);        
+        $result = $this->results($location);
+             
         $this->master = $result;
 
         return $this;
@@ -116,9 +142,9 @@ class Attach {
     protected function name($filename)
     {
         // Get extension.
-        $extension = \File::extension($filename);
+        $extension = $this->files->extension($filename);
 
-        return md5(\Str::random(30).time()).'.'.$extension;
+        return md5(Str::random(30).time()).'.'.$extension;
     }
 
     /**
@@ -192,10 +218,13 @@ class Attach {
     protected function doUpload($key, $path)
     {
         // Get a file input.
-        $file = \Input::file($key);
+        $file = $this->request->file($key);
+
+        // Original name.
+        $origName = $file->getClientOriginalName();
 
         // Generate a file name with extension.
-        $filename = $this->name($file->getClientOriginalName());
+        $filename = $this->name($origName);
 
         if ($file->move($path, $filename))
         {
@@ -222,6 +251,9 @@ class Attach {
             mkdir($path, 0777, true);
         }
 
+        // Original name.
+        $origName = basename($url);
+
         // Generate a file name with extension.
         $filename = $this->name($url);
 
@@ -231,7 +263,7 @@ class Attach {
         // Path to write file.
         $uploadPath = $path.$filename;
 
-        if (\File::put($uploadPath, $bin))
+        if ($this->files->put($uploadPath, $bin))
         {
             return $this->results($uploadPath);            
         }
@@ -248,6 +280,7 @@ class Attach {
     {
         // Fire a result to callback.
         $onUpload = $this->config['onUpload'];
+
         if ($onUpload instanceof Closure) 
         {
             $onUpload($result);
@@ -414,10 +447,12 @@ class Attach {
         if ( ! is_null($master))
         {
             $location = $master['location'];
-            File::delete($location);
+            
+            $this->files->delete($location);
 
             // Fire a result to callback.
             $onRemove = $this->config['onRemove'];
+
             if ($onRemove instanceof Closure) 
             {
                 $onRemove($master);
@@ -455,6 +490,7 @@ class Attach {
     public function __destruct()
     {
         $onComplete = $this->config['onComplete'];
+        
         if ($onComplete instanceof Closure) 
         {
             $onComplete($this->results);

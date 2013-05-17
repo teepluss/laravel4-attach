@@ -30,7 +30,7 @@ class AttachServiceProvider extends ServiceProvider {
 	{
 		$this->app['attach'] = $this->app->share(function($app)
 		{
-			return new Attach($app['config']);
+			return new Attach($app['config'], $app['request'], $app['files']);
 		});
 	}
 
