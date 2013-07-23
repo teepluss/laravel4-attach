@@ -1,14 +1,12 @@
 <?php namespace Teepluss\Attach;
 
-use Illuminate\Config\Repository;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-
 use Closure;
 use WideImage\WideImage;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Config\Repository;
+use Illuminate\Filesystem\Filesystem;
 
- 
 class Attach {
 
     /**
@@ -20,14 +18,14 @@ class Attach {
 
     /**
      * Request.
-     * 
-     * @var Illuminate\Http\Request 
+     *
+     * @var Illuminate\Http\Request
      */
     protected $request;
 
     /**
      * Files.
-     * 
+     *
      * @var Illuminate\Filesystem\Filesystem
      */
     protected $files;
@@ -69,7 +67,7 @@ class Attach {
      * @return  void
      */
     public function __construct(Repository $config, Request $request, Filesystem $files)
-    {   
+    {
         // Get config from file.
         $this->config = $config->get('attach::attach');
 
@@ -87,7 +85,7 @@ class Attach {
      * @return  Attach
      */
     public function inject($config = array())
-    {   
+    {
         if (is_array($config))
         {
             $this->config = array_merge($this->config, $config);
@@ -108,7 +106,7 @@ class Attach {
     {
         $this->file = $file;
 
-        return $this;   
+        return $this;
     }
 
     /**
@@ -125,7 +123,7 @@ class Attach {
 
         // Generate a result to use as a master file.
         $result = $this->results($location);
-             
+
         $this->master = $result;
 
         return $this;
@@ -200,25 +198,28 @@ class Attach {
         {
             $this->master = $result;
             $this->addResult($result);
-        }   
+        }
 
         // Reset values.
         $this->reset();
 
         return $this;
-    }   
+    }
 
     /**
      * Upload from a file input.
      *
-     * @param   string  $key
-     * @param   string  $path
+     * @param   SplFileInfo  $file
+     * @param   string       $path
      * @return  mixed
      */
-    protected function doUpload($key, $path)
+    protected function doUpload($file, $path)
     {
-        // Get a file input.
-        $file = $this->request->file($key);
+        if ( ! $file instanceof SplFileInfo)
+        {
+            // Get a file input.
+            $file = $this->request->file($file);
+        }
 
         // Original name.
         $origName = $file->getClientOriginalName();
@@ -265,7 +266,7 @@ class Attach {
 
         if ($this->files->put($uploadPath, $bin))
         {
-            return $this->results($uploadPath);            
+            return $this->results($uploadPath);
         }
 
         return false;
@@ -281,7 +282,7 @@ class Attach {
         // Fire a result to callback.
         $onUpload = $this->config['onUpload'];
 
-        if ($onUpload instanceof Closure) 
+        if ($onUpload instanceof Closure)
         {
             $onUpload($result);
         }
@@ -363,12 +364,12 @@ class Attach {
             'scale'         => $scale,
             'master'        => $master,
             'subpath'       => $path,
-            'location'      => $location,          
+            'location'      => $location,
             'fileName'      => $fileName,
             'fileExtension' => $fileExtension,
             'fileBaseName'  => $fileBaseName,
             'filePath'      => $filePath,
-            'fileSize'      => $fileSize,         
+            'fileSize'      => $fileSize,
             'url'           => $this->url($filePath),
             'mime'          => $mime,
             'dimension'     => $dimension
@@ -382,7 +383,7 @@ class Attach {
      * @return  Attach
      */
     public function resize($sizes = null)
-    {       
+    {
         // A master file to resize.
         $master = $this->master;
 
@@ -413,7 +414,8 @@ class Attach {
                 if ( ! array_key_exists($size, $scales)) continue;
 
                 // Get width and height.
-                list ($w, $h) = $scales[$size];
+                list($w, $h) = $scales[$size];
+
 
                 // Path with the name include scale and extension.
                 $uploadPath = $path.$master['fileName'].'_'.$size.'.'.$master['fileExtension'];
@@ -427,9 +429,10 @@ class Attach {
                 // Add a result and fired.
                 $result = $this->results($uploadPath, $size);
 
+
                 // Add a result.
                 $this->addResult($result);
-            }       
+            }
         }
 
         return $this;
@@ -447,16 +450,16 @@ class Attach {
         if ( ! is_null($master))
         {
             $location = $master['location'];
-            
+
             $this->files->delete($location);
 
             // Fire a result to callback.
             $onRemove = $this->config['onRemove'];
 
-            if ($onRemove instanceof Closure) 
+            if ($onRemove instanceof Closure)
             {
                 $onRemove($master);
-            }           
+            }
         }
 
         return $this;
@@ -490,8 +493,8 @@ class Attach {
     public function __destruct()
     {
         $onComplete = $this->config['onComplete'];
-        
-        if ($onComplete instanceof Closure) 
+
+        if ($onComplete instanceof Closure)
         {
             $onComplete($this->results);
         }

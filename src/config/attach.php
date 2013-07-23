@@ -35,7 +35,7 @@ return array(
     |
     */
 
-    'baseDir' => \App::make('path.public').'/uploads',   
+    'baseDir' => \App::make('path.public').'/uploads',
 
     /*
     |--------------------------------------------------------------------------
@@ -45,7 +45,7 @@ return array(
     | You can append a sub directories to base path
     | this allow you to use 'Closure'.
     |
-    */  
+    */
 
     'subpath' => null,
 
@@ -54,17 +54,17 @@ return array(
     | All scales to resize.
     |--------------------------------------------------------------------------
     |
-    | For image uploaded you can resize to 
+    | For image uploaded you can resize to
     | selected or whole of scales.
     |
     */
 
     'scales' => array(
-        'wm' => array(260, 180),
-        'wl' => array(300, 200),
-        'wx' => array(360, 270),
-        'ww' => array(260, 120),
-        'ws' => array(160, 120),
+        //'wm' => array(260, 180),
+        //'wl' => array(300, 200),
+        //'wx' => array(360, 270),
+        //'ww' => array(260, 120),
+        //'ws' => array(160, 120),
         'l'  => array(200, 200),
         'm'  => array(125, 125),
         's'  => array(64, 64),
@@ -76,7 +76,7 @@ return array(
     | Callback on each file uploaded.
     |--------------------------------------------------------------------------
     |
-    | This should be closure to listen when each file uploaded. 
+    | This should be closure to listen when each file uploaded.
     |
     */
 
@@ -87,7 +87,7 @@ return array(
     | Callback on all files uploaded.
     |--------------------------------------------------------------------------
     |
-    | This should be closure to listen when all files uploaded. 
+    | This should be closure to listen when all files uploaded.
     |
     */
 
@@ -98,7 +98,7 @@ return array(
     | Callback on all files deleted.
     |--------------------------------------------------------------------------
     |
-    | This should be closure to listen when file deleted. 
+    | This should be closure to listen when file deleted.
     |
     */
 
