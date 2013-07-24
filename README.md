@@ -43,14 +43,75 @@ php artisan config:publish teepluss/attach
 
 ## Usage
 
+Basic upload
 ~~~php
- $attach = Attach::inject(array(
+$attach = Attach::inject(array(
     'subpath' => 'tee'
 ))
-->add('userfile')->upload()->resize();
-
+->add(Input::file('userfile'))
+->upload();
 
 var_dump($attach->onComplete());
+~~~
+
+Remote upload
+~~~php
+$attach = Attach::inject(array(
+    'remote' => true
+))
+->add('http://...../file.png')
+->upload();
+~~~
+
+Resizing
+~~~php
+$attach = Attach::open('/path/to/image.png')->resize();
+
+// To specific scales from config.
+
+$attach = Attach::open('/path/to/image.png')->resize(array('l', 'm'));
+~~~
+
+Upload and Resize
+~~~php
+$attach = Attach::add(Input::file('userfile'))->upload()->resize();
+~~~
+
+Remove
+~~~php
+$attach = Attach::open($path)->remove();
+~~~
+
+You can inject your config anytime
+~~~php
+$attach = Attach::inject(array(
+    ..... YOUR CONFIG .....
+))
+->upload();
+~~~
+
+Callback
+~~~php
+Attach::inject(array(
+
+    'onUpload' => function($result)
+    {
+        //
+    },
+
+    'onComplete' => function($results)
+    {
+        //
+    },
+
+    'onRemove' => function($result)
+    {
+        //
+    }
+
+))
+->upload()
+->resize();
 ~~~
 
 ## Support or Contact

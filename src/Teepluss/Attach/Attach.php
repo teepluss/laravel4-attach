@@ -215,9 +215,8 @@ class Attach {
      */
     protected function doUpload($file, $path)
     {
-        if ( ! $file instanceof SplFileInfo)
+        if ( ! $file instanceof \SplFileInfo)
         {
-            // Get a file input.
             $file = $this->request->file($file);
         }
 
@@ -446,6 +445,8 @@ class Attach {
     public function remove()
     {
         $master = $this->master;
+
+        $stacks = array();
 
         if ( ! is_null($master))
         {
