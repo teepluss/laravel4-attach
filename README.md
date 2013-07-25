@@ -5,7 +5,7 @@ Attach is a file uploader for Laravel version 4.
 ### Installation
 
 - [Attach on Packagist](https://packagist.org/packages/teepluss/attach)
-- [Theme on GitHub](https://github.com/teepluss/laravel4-attach.git)
+- [Attach on GitHub](https://github.com/teepluss/laravel4-attach.git)
 
 To get the lastest version of Theme simply require it in your `composer.json` file.
 
