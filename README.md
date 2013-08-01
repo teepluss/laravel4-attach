@@ -30,7 +30,7 @@ Attach also ships with a facade which provides the static syntax for creating co
 ~~~
 'aliases' => array(
 
-    'Theme' => 'Teepluss\Attach\Facades\Attach'
+    'Attach' => 'Teepluss\Attach\Facades\Attach'
 
 )
 ~~~
