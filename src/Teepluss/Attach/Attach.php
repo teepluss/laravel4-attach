@@ -376,6 +376,33 @@ class Attach {
     }
 
     /**
+     * Get dimension from config.
+     *
+     * @param  string  $scale
+     * @param  mixed   $combine
+     * @return mixed
+     */
+    public function dimension($scale, $combine = false)
+    {
+        static $scales;
+
+        if ( ! $scales)
+        {
+            // All scales available.
+            $scales = $this->config['scales'];
+        }
+
+        $dimension = array_get($scales, $scale);
+
+        if ($combine)
+        {
+            return implode($combine, $dimension);
+        }
+
+        return $dimension;
+    }
+
+    /**
      * Resize master image file.
      *
      * @param   array   $sizes
