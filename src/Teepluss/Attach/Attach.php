@@ -1,7 +1,9 @@
 <?php namespace Teepluss\Attach;
 
 use Closure;
-use WideImage\WideImage;
+use Imagine\Image\Box;
+use Imagine\Gd\Imagine;
+use Imagine\Image\Point;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Config\Repository;
@@ -447,10 +449,21 @@ class Attach {
                 $uploadPath = $path.$master['fileName'].'_'.$size.'.'.$master['fileExtension'];
 
                 // Use WideImage to make resize and crop.
-                WideImage::load($master['location'])
-                    ->resize($w, $h, 'outside')
-                    ->crop('center', 'middle', $w, $h)
-                    ->saveToFile($uploadPath);
+                // WideImage::load($master['location'])
+                //     ->resize($w, $h, 'outside')
+                //     ->crop('center', 'middle', $w, $h)
+                //     ->saveToFile($uploadPath);
+
+                // Use Imagine to make resize and crop.
+                $options = array(
+                    'jpeg_quality'          => array_get($this->config, 'quality.jpeg', 90),
+                    'png_compression_level' => array_get($this->config, 'quality.png', 90) / 10,
+                );
+
+                $imagine = new Imagine();
+                $image = $imagine->open($master['location']);
+                $image->thumbnail(new Box($w, $h), 'outbound')
+                      ->save($uploadPath, $options);
 
                 // Add a result and fired.
                 $result = $this->results($uploadPath, $size);
